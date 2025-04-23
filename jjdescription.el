@@ -1,4 +1,11 @@
-;; jjdescription.el --- Major mode for editing Jujutsu description files
+;;; jjdescription.el --- Major mode for editing Jujutsu description files -*- lexical-binding: t; -*-
+
+;; Author: Rami Chowdhury <rami.chowdhury@gmail.com>
+;; URL: https://github.com/necaris/jjdescription.el
+;; Version: 0.1
+;; Package-Requires: ((emacs "25.1"))
+
+;; SPDX-License-Identifier: Vim
 
 ;;; Commentary:
 ;; Provides syntax highlighting for .jjdescription files used by the `jj' tool,
@@ -119,9 +126,7 @@ Returns the end position if successful, nil otherwise."
     ;; Matcher for the first line (Summary + Overflow). Must run first.
     (jjdescription--match-first-line)
     ;; Matcher for "JJ: " lines and their contents.
-    ;; Uses a function to handle the base comment face AND nested highlighting.
     (jjdescription--highlight-jj-line))
-
   "Font lock keywords for `jjdescription-mode'.")
 
 
