@@ -45,30 +45,31 @@ with `jjdescription-overflow-face'."
 
 (defface jjdescription-comment-face
   '((t :inherit font-lock-comment-face))
-  "Face for 'JJ:' comment lines."
+  "Face for `JJ:' comment lines."
   :group 'jjdescription)
 
 (defface jjdescription-header-face
   '((t :inherit font-lock-preprocessor-face))
-  "Face for headers within 'JJ:' comment lines (e.g., 'Conflicts:')."
+  "Face for headers within `JJ:' comment lines (e.g., `Conflicts:')."
   :group 'jjdescription)
 
 (defface jjdescription-type-face
   '((t :inherit font-lock-type-face))
-  "Face for change types (C, R, M, A, D) in 'JJ:' comment lines."
+  "Face for change types (C, R, M, A, D) in `JJ:' comment lines."
   :group 'jjdescription)
 
 (defface jjdescription-file-face
   '((t :inherit font-lock-constant-face))
-  "Face for filenames in 'JJ:' comment lines."
+  "Face for filenames in `JJ:' comment lines."
   :group 'jjdescription)
 
 
 ;;; Font-Lock Keywords
 
-(defun jjdescription--match-first-line (limit)
-  "Match and highlight the first line as summary/overflow.
-Returns the end position if successful, nil otherwise."
+(defun jjdescription--match-first-line ()
+  "Highlight the first line as summary.
+Will mark characters beyond `jjdescription-summary-length' as overflow. Return
+the end position if successful, nil otherwise."
   (when (eq (point-min) (line-beginning-position))
     (let ((end (line-end-position)))
       (when (< (point) end) ; Ensure we are not at the end of the line already
@@ -96,7 +97,7 @@ Returns the end position if successful, nil otherwise."
         end)))) ; Return end position
 
 (defun jjdescription--highlight-jj-line (limit)
-  "Highlight 'JJ:' line and its internal elements.
+  "Highlight `JJ:' line and its internal elements, matching up to LIMIT.
 Returns the end position if successful, nil otherwise."
   ;; Match the whole line first to ensure context
   (when (re-search-forward "^JJ: .*" limit t)
@@ -135,7 +136,7 @@ Returns the end position if successful, nil otherwise."
 ;;;###autoload
 (define-derived-mode jjdescription-mode text-mode "JJDescription"
   "Major mode for editing `jj' description files.
-Provides syntax highlighting for summary line, 'JJ:' comments,
+Provides syntax highlighting for summary line, `JJ:' comments,
 headers, change types, and filenames.
 
 \\{jjdescription-mode-map}"
