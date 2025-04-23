@@ -1,0 +1,8 @@
+* Syntax highlighting for [[https://jj-vcs.github.io/jj/latest/][Jujutsu]] description files
+
+Based on the [[https://github.com/avm99963/vim-jjdescription/blob/main/LICENSE][Vim plugin]], so licensed accordingly. Usage should be as simple as:
+
+#+begin_src emacs-lisp
+(use-package jjdescription
+  :commands jjdescription-mode )
+#+end_src
