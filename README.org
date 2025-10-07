@@ -4,5 +4,11 @@ Based on the [[https://github.com/avm99963/vim-jjdescription/blob/main/LICENSE][
 
 #+begin_src emacs-lisp
 (use-package jjdescription
-  :commands jjdescription-mode )
+  :commands jjdescription-mode)
+#+end_src
+
+** Tests
+
+#+begin_src console
+emacs --batch -L . -L test -l jjdescription-test.el -f ert-run-tests-batch-and-exit
 #+end_src

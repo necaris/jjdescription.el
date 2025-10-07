@@ -1,0 +1,22 @@
+hello world! I like to have extended conversations which may overflow
+JJ: <- jjdescription-summary-face
+JJ:                                                ^jjdescription-overflow-face
+
+JJ:
+JJ: <- jjdescription-comment-face
+
+This is an initial "Hello, world!" implementation, nothing fancy.
+
+JJ: This commit contains the following changes:
+JJ: <- jjdescription-comment-face
+JJ:                                     ^ jjdescription-comment-face
+JJ:     A .gitignore
+JJ:     ^ (jjdescription-type-face jjdescription-comment-face)
+JJ:        ^ (jjdescription-file-face jjdescription-comment-face)
+JJ:     A Cargo.lock
+JJ:     A Cargo.toml
+JJ:     A src\main.rs
+JJ: Signed-Off-By: necaris
+JJ:   ^ (jjdescription-header-face jjdescription-comment-face)
+
+JJ: Lines starting with "JJ: " (like this one) will be removed.
