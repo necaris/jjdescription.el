@@ -49,7 +49,7 @@ with `jjdescription-overflow-face'."
   :group 'jjdescription)
 
 (defface jjdescription-header-face
-  '((t :inherit font-lock-preprocessor-face))
+  '((t :inherit font-lock-doc-face))
   "Face for headers within `JJ:' comment lines (e.g., `Conflicts:')."
   :group 'jjdescription)
 
@@ -63,73 +63,38 @@ with `jjdescription-overflow-face'."
   "Face for filenames in `JJ:' comment lines."
   :group 'jjdescription)
 
-
 ;;; Font-Lock Keywords
 
-(defun jjdescription--match-first-line ()
-  "Highlight the first line as summary.
-Will mark characters beyond `jjdescription-summary-length' as overflow. Return
-the end position if successful, nil otherwise."
-  (when (eq (point-min) (line-beginning-position))
-    (let ((end (line-end-position)))
-      (when (< (point) end) ; Ensure we are not at the end of the line already
-        (goto-char end)
-        (let* ((bol (line-beginning-position))
-               (line-content (buffer-substring-no-properties bol end))
-               ;; Use `string-width` for visual length calculation
-               (len (string-width line-content))
-               (limit-col (if (and (boundp 'jjdescription-summary-length)
-                                   (> jjdescription-summary-length 0))
-                              jjdescription-summary-length
-                            -1)))
-          (if (or (< limit-col 1) (<= len limit-col))
-              ;; Whole line is within limit or no limit
-              (put-text-property bol end 'face 'jjdescription-summary-face)
-            ;; Line exceeds limit, split highlighting
-            (let ((split-pos (save-excursion
-                               (goto-char bol)
-                               (move-to-column limit-col)
-                               (point))))
-              (put-text-property bol split-pos 'face 'jjdescription-summary-face)
-              (put-text-property split-pos end 'face 'jjdescription-overflow-face))))
-        ;; Set property to allow next rules to potentially use context
-        (put-text-property (point-min) end 'jit-lock-defer-multiline t)
-        end)))) ; Return end position
-
-(defun jjdescription--highlight-jj-line (limit)
-  "Highlight `JJ:' line and its internal elements, matching up to LIMIT.
-Returns the end position if successful, nil otherwise."
-  ;; Match the whole line first to ensure context
-  (when (re-search-forward "^JJ: .*" limit t)
-    (let ((line-start (match-beginning 0))
-          (line-end (match-end 0)))
-      ;; Apply base comment face to the whole line
-      (put-text-property line-start line-end 'face 'jjdescription-comment-face)
-      ;; Highlight internal parts (Header or Type/File)
-      (save-excursion
-        (goto-char line-start)
-        ;; Check for Header: "JJ: <non-space-stuff>:"
-        (if (re-search-forward "^JJ: +\\(\\S-.*:\\)$" line-end t)
-            (put-text-property (match-beginning 1) (match-end 1)
-                               'face 'jjdescription-header-face)
-          ;; Else check for Type + File: "JJ: [CRMAD] <file>"
-          (progn ; Use progn if header didn't match, reset position
-            (goto-char line-start)
-            (when (re-search-forward "^JJ: +\\([CRMAD]\\) +\\(.*\\)$" line-end t)
-              (put-text-property (match-beginning 1) (match-end 1)
-                                 'face 'jjdescription-type-face)
-              (put-text-property (match-beginning 2) (match-end 2)
-                                 'face 'jjdescription-file-face)))))
-      line-end))) ; Return end position
+(defun jjdescription--match-first-line (limit)
+  "Match the first line of the buffer up to LIMIT.
+Sets match data: group 1 for text within length limit, group 2 for overflow."
+  (when (and (= (point) (point-min)) (< (point) limit))
+    (let ((eol (line-end-position))
+          (split-pos (when (> jjdescription-summary-length 0)
+                       (save-excursion
+                         (move-to-column jjdescription-summary-length)
+                         (point)))))
+      (if (or (not split-pos) (>= split-pos eol))
+          (set-match-data (list (point) eol (point) eol))
+        (set-match-data (list (point) eol (point) split-pos split-pos eol)))
+      (goto-char eol)
+      t)))
 
 (defconst jjdescription-font-lock-keywords
-  `(
-    ;; Matcher for the first line (Summary + Overflow). Must run first.
-    (jjdescription--match-first-line)
-    ;; Matcher for "JJ: " lines and their contents.
-    (jjdescription--highlight-jj-line))
+  `((jjdescription--match-first-line
+     (1 'jjdescription-summary-face prepend t)
+     (2 'jjdescription-overflow-face prepend t))
+    ("JJ:[[:blank:]]+\\([A-Za-z][-_A-Za-z0-9]*:\\)"
+     (beginning-of-line) (end-of-line)
+     (1 'jjdescription-header-face prepend t))
+    ("[[:blank:]]+\\([CRMAD]\\)\\(.*\\)"
+     (beginning-of-line) (end-of-line)
+     (1 'jjdescription-type-face prepend t)
+     (2 'jjdescription-file-face prepend t))
+    ("JJ:.*"
+     (beginning-of-line) (end-of-line)
+     (0 'jjdescription-comment-face append t)))
   "Font lock keywords for `jjdescription-mode'.")
-
 
 ;;; Major Mode Definition
 
@@ -142,8 +107,8 @@ headers, change types, and filenames.
 \\{jjdescription-mode-map}"
   :group 'jjdescription
   (setq-local font-lock-defaults '(jjdescription-font-lock-keywords t))
-  (setq-local comment-start "JJ: ")
-  (setq-local comment-start-skip "\\(?:JJ:\\| \\)[ \t]*")
+  (setq-local comment-start "JJ:")
+  (setq-local comment-start-skip "^JJ:[ \t]*\\|^JJ:$")
   ;; Enable context-based highlighting needed for the first line rule
   (setq-local jit-lock-contextually t))
 
