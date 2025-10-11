@@ -48,9 +48,14 @@ with `jjdescription-overflow-face'."
   "Face for `JJ:' comment lines."
   :group 'jjdescription)
 
-(defface jjdescription-header-face
+(defface jjdescription-header-key-face
   '((t :inherit font-lock-doc-face))
   "Face for headers within `JJ:' comment lines (e.g., `Conflicts:')."
+  :group 'jjdescription)
+
+(defface jjdescription-header-value-face
+  '((t :inherit font-lock-bracket-face))
+  "Face for values paired with headers within `JJ:' comment lines."
   :group 'jjdescription)
 
 (defface jjdescription-type-face
@@ -84,13 +89,14 @@ Sets match data: group 1 for text within length limit, group 2 for overflow."
   `((jjdescription--match-first-line
      (1 'jjdescription-summary-face prepend t)
      (2 'jjdescription-overflow-face prepend t))
-    ("JJ:[[:blank:]]+\\([A-Za-z][-_A-Za-z0-9]*:\\)"
-     (beginning-of-line) (end-of-line)
-     (1 'jjdescription-header-face prepend t))
-    ("[[:blank:]]+\\([CRMAD]\\)\\(.*\\)"
+    ("JJ:[[:blank:]]*\\([CRMAD]\\)[[:blank:]]+\\(.*\\)"
      (beginning-of-line) (end-of-line)
      (1 'jjdescription-type-face prepend t)
      (2 'jjdescription-file-face prepend t))
+    ("JJ:[[:blank:]]*\\([A-Za-z][-_A-Za-z0-9]*:\\)\\(.*\\)"
+     (beginning-of-line) (end-of-line)
+     (1 'jjdescription-header-key-face prepend t)
+     (2 'jjdescription-header-value-face prepend t))
     ("JJ:.*"
      (beginning-of-line) (end-of-line)
      (0 'jjdescription-comment-face append t)))
