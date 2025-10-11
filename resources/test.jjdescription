@@ -17,6 +17,11 @@ JJ:     A Cargo.lock
 JJ:     A Cargo.toml
 JJ:     A src\main.rs
 JJ: Signed-Off-By: necaris
-JJ:   ^ (jjdescription-header-face jjdescription-comment-face)
+JJ:   ^ (jjdescription-header-key-face jjdescription-comment-face)
+JJ:                 ^ (jjdescription-header-value-face jjdescription-comment-face)
+JJ: Change-Id: 9837149
+JJ: ^ (jjdescription-header-key-face jjdescription-comment-face)
+JJ:  ^ (jjdescription-header-key-face jjdescription-comment-face)
+JJ:                 ^ (jjdescription-header-value-face jjdescription-comment-face)
 
 JJ: Lines starting with "JJ: " (like this one) will be removed.
